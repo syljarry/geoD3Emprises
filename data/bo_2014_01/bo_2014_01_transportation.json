@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "file_name": "9798.xml", "S": -22.9, "E": -57.52, "O": -69.65, "N": -9.67, "categories": "transportation" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -69.65, -9.67 ], [ -57.52, -9.67 ], [ -57.52, -22.9 ], [ -69.65, -22.9 ], [ -69.65, -9.67 ] ] ] } }
+]
+}

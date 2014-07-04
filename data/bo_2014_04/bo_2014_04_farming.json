@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "E": "-69.92818", "file_name": "116.xml", "nb": 1, "O": "-66.37884", "N": "-14.0943", "S": "-17.90139", "categories": "farming" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -66.37884, -14.0943 ], [ -66.37884, -17.90139 ], [ -69.92818, -17.90139 ], [ -69.92818, -14.0943 ], [ -66.37884, -14.0943 ] ] ] } }
+]
+}

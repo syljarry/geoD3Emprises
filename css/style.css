@@ -1,0 +1,287 @@
+/*	________________________
+	|       Chapeau         |
+	|_______________________|
+	| menuleft |  menuright | m
+	|__________|____________| e
+	|      Y  e  a  r     | | n
+	|_______________________| u
+    |                       |
+    |                       |
+    |          map          |
+    |                       |
+    |_______________________|
+*/
+
+
+html {
+	color:#323232;
+	font-family:"Open Sans", helvetica, arial, verdana,sans-serif;
+	font-size: 0.9em;
+	text-align: justify;
+}
+body{
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+h1{
+	font-size: 2em;
+}
+h2{
+	font-size: 1em;
+}
+ul{
+	list-style: none;
+}
+li{
+    list-style: none;
+	margin-bottom: 10px;
+}
+svg {
+    display:block; /* required for firefox to give valid
+    height and width used values for getComputedStyle()
+    see https://bugzilla.mozilla.org/show_bug.cgi?id=874919
+    */
+    /*border:1px solid #ccc;
+    border-radius: 10px;*/
+   margin: auto;
+}
+select {
+    padding: 0 15px 0 15px;
+    font-size : 14px
+}
+
+/* background container (contient tout le reste) */
+#container {
+	position:absolute;
+	width:100%;
+	height:100%;
+}
+/* class contenant chapeau et menu, permet un bandeau fixe en haut de la fenetre */
+.bandeauFix {
+    position: fixed;
+    z-index: 10;
+    background-color: #ffffff;
+}
+/* chapeau */
+#chapeau {
+	width:100%;
+	height:70px;
+	padding: 5px;
+    text-align: center;
+}
+/* div contenant le liens vers conseils d'utilisation et bouton d'ajout nouvelle carte */
+#info {
+    height:100px;
+    z-index:20;
+}
+/* Bouton pour ajouter de nouvelle carte */
+#ajoutCarte {
+    padding: 8px 16px;
+    margin-left: 50px;
+    margin-top: 40px;
+    font-size: 14px;
+}
+/* menus : contient menuleft et menuright) et years */
+#menu {
+	margin-top: 70px;
+	width:100%;
+	height:100px;
+}
+/* menus, left part */
+#menuleft {
+	position: absolute;
+	width:50%;
+	height:50px;
+	text-align: right;
+}
+/* menus, right part */
+#menuright {
+	position: absolute;
+	margin-left: 50%;
+	width:50%;
+	height:50px;
+}
+/* years */
+#years {
+	position: absolute;
+	margin-top: 60px;
+	width: 100%;
+	height: 40px;
+    text-align: center;
+}
+/* main : contient toute les cartes créé dynamiquement */
+#main {
+	position: absolute;
+	margin-top: 170px;
+	width: 100%;
+	height: 75%;
+}
+
+/* classe utilisé pour carte + Legend*/
+.map {
+    position: absolute;
+    height: 500px;
+}
+
+.Legend {
+    background: #eee;
+    position: absolute;
+    width: 200px;
+    height: 400px;
+    padding: 5px;
+    font-size: 0.9em;
+    z-index: 1;
+}
+
+.type {
+    position: absolute;
+    height: 210px;
+}
+
+.dispo {
+    position: absolute;
+    margin-top: 210px;
+    height: 170px;
+}
+
+.carte {
+    position: absolute;
+    margin-left: 210px;
+    width:1000px;
+    border: 0 solid #eee;
+    border-right-width: 2px;
+}
+
+
+.rmt{
+}
+.rd{
+}
+
+/* style des limites du planisphère */
+.plani {
+  stroke: darkgray;
+  stroke-width: 1px;
+  fill: none;
+}
+
+/* style de base des emprises */
+.cl_emprises {
+    opacity: 1;
+}
+/*overlay sur les cartes pour permettre le zoom en pointant n'importe qu'elle zone de la carte avec la souris.*/
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+/* style de base des pays */
+.cl_pays {
+    fill: none;
+    stroke: darkgray;
+    pointer-events: all;
+}
+/* style du triangle de la ligne des années */
+path.triangle {
+	stroke: darkgray;
+	stroke-width: 4;
+	fill: darkgray;
+}
+/* style des cercles proportionnels */
+circle {
+	fill: blue;
+	opacity: 0.5;
+	stroke:blue;
+	stroke-width: 1;
+}
+/* style des cercles proportionnels évidés */
+circle.gros {
+	fill: none;
+	opacity: 0.5;
+	stroke: blue;
+	stroke-width: 2.5;
+}
+/* style des ronds pour les années */
+circle.year {
+	fill: white;
+	opacity: 1;
+	stroke: darkgray;
+	stroke-width: 4;
+	cursor: pointer;
+}
+/* style du rond pour l'année sélectionnée */
+circle.yearselect {
+	fill: rgb(216,226,255);
+	opacity: 1;
+	stroke: darkgray;
+	stroke-width: 4;
+}
+/* style du rond pour la légende */
+circle.Legend {
+	opacity: 0.5;
+	stroke: blue;
+}
+/* style des lignes pour la légende */
+line.Legend{
+	stroke: #323232;
+	stroke-width: 1;
+	stroke-dasharray: 4, 2;
+}
+/* style des étiquettes pour la légende */
+text.Legend{
+	fill: #323232;
+}
+
+/* pour les boutons radio : http://viralpatel.net/blogs/css-radio-button-checkbox-background/ */
+input[type=radio] {
+	display:none;
+}
+input[type=radio] + label {
+    display:inline-block;
+    padding: 4px 12px;
+    margin: -2px -2px 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    background-image: -moz-linear-gradient(top,#fff,#e6e6e6);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#e6e6e6));
+    background-image: -webkit-linear-gradient(top,#fff,#e6e6e6);
+    background-image: -o-linear-gradient(top,#fff,#e6e6e6);
+    background-image: linear-gradient(to bottom,#fff,#e6e6e6);
+    background-repeat: repeat-x;
+    border: 1px solid;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+    border-bottom-color: #b3b3b3;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#ffe6e6e6',GradientType=0,enabled=false);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+}
+input[type=radio]:checked + label {
+    outline: 0;
+    -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+    -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+    background: #e0e0e0 none;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 60px;
+    padding: 8px;
+    font: 10px sans-serif;
+    background: #ddd;
+    border: solid 1px #aaa;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 20;
+}

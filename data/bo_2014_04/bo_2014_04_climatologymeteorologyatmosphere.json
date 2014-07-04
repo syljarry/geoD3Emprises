@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "E": "-62.61409", "file_name": "58.xml", "nb": 1, "O": "-66.93116", "N": "-11.706136706", "S": "-18.05997", "categories": "climatologyMeteorologyAtmosphere" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -66.93116, -11.706136706 ], [ -62.61409, -11.706136706 ], [ -62.61409, -18.05997 ], [ -66.93116, -18.05997 ], [ -66.93116, -11.706136706 ] ] ] } }
+]
+}

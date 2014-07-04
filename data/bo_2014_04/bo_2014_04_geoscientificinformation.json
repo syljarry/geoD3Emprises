@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "gid": 1, "nb": "3" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -69.65, -9.67 ], [ -57.52, -9.67 ], [ -57.52, -22.9 ], [ -69.65, -22.9 ], [ -69.65, -9.67 ] ] ] } }
+]
+}

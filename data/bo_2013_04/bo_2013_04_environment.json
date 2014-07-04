@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "file_name": "911.xml", "S": -22.9011, "E": -57.5211, "O": -69.6562, "N": -9.6792, "categories": "environment" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -69.6562, -9.6792 ], [ -57.5211, -9.6792 ], [ -57.5211, -22.9011 ], [ -69.6562, -22.9011 ], [ -69.6562, -9.6792 ] ] ] } }
+]
+}

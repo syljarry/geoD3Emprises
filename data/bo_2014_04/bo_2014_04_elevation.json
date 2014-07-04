@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "E": "-57.5211", "file_name": "86.xml", "nb": 1, "O": "-69.6562", "N": "-9.6792", "S": "-22.9011", "categories": "elevation" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -69.6562, -9.6792 ], [ -57.5211, -9.6792 ], [ -57.5211, -22.9011 ], [ -69.6562, -22.9011 ], [ -69.6562, -9.6792 ] ] ] } }
+]
+}
