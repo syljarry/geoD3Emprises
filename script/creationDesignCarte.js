@@ -328,6 +328,7 @@ function miseEnPageLegende(carte, h, w, position) {
     var wcarte, marcarte, wsvg;
     if (position == "Gauche") {
         internConfigLegend();
+        internConfigLegendGauche();
         //Modification de la taille de la carte par les parametre donné moins la taille de la légende.
         wcarte = w - parseFloat(carte.div_legend.style("width"));
         marcarte = 9 + parseFloat(carte.div_legend.style("width"));//+9 de padding pour afficher entierement le bouton "supprimer".
@@ -337,6 +338,7 @@ function miseEnPageLegende(carte, h, w, position) {
     if (position == "Unique") {
         if (carte.id == tableauCarte[0].id) {
             internConfigLegend();
+            internConfigLegendGauche();
             //Modification de la taille de la carte par les parametres donné moins la taille de la légende.
             wcarte = w - parseFloat(carte.div_legend.style("width"));
             marcarte = 9 + parseFloat(carte.div_legend.style("width"));//+9 de padding pour afficher entierement la liste des données.
@@ -369,11 +371,15 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_type.style("height", carte.div_legend.style("height"));
         carte.div_type.select("h2").text(null);
         carte.div_type.select("p").text(null);
+
         carte.div_type.select("svg").attr("height", 80);
-        carte.div_type.select("svg").select("g").attr("transform", "translate(0,-22)");
         carte.div_dispo.select("h2").text(null);
         carte.div_dispo.style("margin-top", 0 + "px")
-            .style("margin-left", 170 + "px");
+            .style("margin-left", 280 + "px");
+        //!!!!!!!!!!!!!!!!!!!!!!
+        interConfigLegendDessous();
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     }
 
     function internConfigLegend() {
@@ -386,7 +392,6 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_type.select("h2").text(carte.Legend.titre);
         carte.div_type.select("p").text(carte.Legend.type);
         carte.div_type.select("svg").attr("height", carte.Legend.heightLegend + "px");
-        carte.div_type.select("svg").select("g").attr("transform", "translate(0,0)");
         carte.div_dispo.select("h2").text(carte.Legend.sousTitre);
         carte.div_dispo.style("margin-top", 210 + "px")
             .style("margin-left", 0 + "px");
@@ -402,5 +407,122 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.svg_map.transition().duration(duree_transition2)
             .attr("width", wsvg)
             .attr("height", h);
+    }
+
+    function interConfigLegendDessous() {
+        //refonte du svg legende :
+        carte.div_type.select("svg").remove();
+        //svg pour la légende
+        var svg_legende = carte.div_type.append("svg")
+            .attr("width", 800)
+            .attr("height", 70);
+
+        var legend = svg_legende.selectAll("g.legend")
+            .data(color_domain)
+            .enter()
+            .append("g")
+            .attr("class", "legend");
+
+        var compteur = 0;
+        var etage = 0;
+        var colonne = -1;
+        legend.append("rect")
+            .attr("x", function () {
+                if (compteur > 2) {
+                    compteur = 1;
+                    etage++;
+                }
+                else {
+                    compteur++;
+                }
+                return 80 * etage;
+            })
+            .attr("y", function () {
+                if (colonne > 1) {
+                    colonne = 0;
+                }
+                else {
+                    colonne++;
+                }
+                return colonne * ls_h;
+            })
+            .attr("width", ls_w)
+            .attr("height", ls_h)
+            .style("fill", function (d) {
+                return color(d);
+            })
+            .style("stroke", "gray")
+            .style("stroke-width", 0)
+            .style("opacity", 0.8);
+
+        compteur = 0;
+        etage = 0;
+        colonne = -1;
+        legend.append("text")
+            .attr("x", function (d, i) {
+                if (compteur > 2) {
+                    compteur = 1;
+                    etage++;
+                }
+                else {
+                    compteur++;
+                }
+                return i < 3 ? 20 + 100 * etage : 100 * etage;
+            })
+            .attr("y", function () {
+                if (colonne > 1) {
+                    colonne = 0;
+                }
+                else {
+                    colonne++;
+                }
+                return ls_h + colonne * ls_h;
+            })
+            .text(function (d, i) {
+                return legend_labels[i];
+            });
+    }
+
+    function internConfigLegendGauche(){
+        carte.div_type.select("svg").remove();
+        //svg pour la légende
+        var svg_legende = carte.div_type.append("svg")
+            .attr("width", 800)
+            .attr("height", carte.Legend.heightLegend);
+// Légende pour la carte choroplèthe
+        svg_legende.append("text")
+            .attr("x", 20)
+            .attr("y", 30)
+            .text(titre_leg);
+
+        var legend = svg_legende.selectAll("g.legend")
+            .data(color_domain)
+            .enter()
+            .append("g")
+            .attr("class", "legend");
+
+
+        legend.append("rect")
+            .attr("x", 20)
+            .attr("y", function (d, i) {
+                return carte.Legend.heightLegend - (i * ls_h) - 2 * ls_h;
+            })
+            .attr("width", ls_w)
+            .attr("height", ls_h)
+            .style("fill", function (d, i) {
+                return color(d);
+            })
+            .style("stroke", "gray")
+            .style("stroke-width", 0)
+            .style("opacity", 0.8);
+
+        legend.append("text")
+            .attr("x", 50)
+            .attr("y", function (d, i) {
+                return carte.Legend.heightLegend - (i * ls_h) - ls_h - 4;
+            })
+            .text(function (d, i) {
+                return legend_labels[i];
+            });
     }
 }

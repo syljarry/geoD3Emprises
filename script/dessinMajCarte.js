@@ -15,50 +15,127 @@
  */
 var dessin_Legend = function(carte) {
     /*--------------Premiere partie : titre, type, svg légende--------------------- */
+    if (getOrgaLegend() == "Dessous") {
+        carte.div_type.select("svg").remove();
+        //svg pour la légende
+        var svg_legende = carte.div_type.append("svg")
+            .attr("width", 800)
+            .attr("height", 70);
 
-    //svg pour la légende
-    var svg_legende = carte.div_type.append("svg")
-        .attr("width", carte.Legend.widthLegend)
-        .attr("height", carte.Legend.heightLegend);
+        var legend = svg_legende.selectAll("g.legend")
+            .data(color_domain)
+            .enter()
+            .append("g")
+            .attr("class", "legend");
+
+        var compteur = 0;
+        var etage = 0;
+        var colonne = -1;
+        legend.append("rect")
+            .attr("x", function () {
+                if (compteur > 2) {
+                    compteur = 1;
+                    etage++;
+                }
+                else {
+                    compteur++;
+                }
+                return 80 * etage;
+            })
+            .attr("y", function (d, i) {
+                if (colonne > 1) {
+                    colonne = 0;
+                }
+                else {
+                    colonne++;
+                }
+                return colonne * ls_h;
+            })
+            .attr("width", ls_w)
+            .attr("height", ls_h)
+            .style("fill", function (d, i) {
+                return color(d);
+            })
+            .style("stroke", "gray")
+            .style("stroke-width", 0)
+            .style("opacity", 0.8);
+
+        compteur = 0;
+        etage = 0;
+        colonne = -1;
+        legend.append("text")
+            .attr("x", function (d, i) {
+                if (compteur > 2) {
+                    compteur = 1;
+                    etage++;
+                }
+                else {
+                    compteur++;
+                }
+                return i < 3 ? 20 + 100 * etage : 100 * etage;
+            })
+            .attr("y", function (d, i) {
+                if (colonne > 1) {
+                    colonne = 0;
+                }
+                else {
+                    colonne++;
+                }
+                return ls_h + colonne * ls_h;
+            })
+            .text(function (d, i) {
+                return legend_labels[i];
+            });
+        carte.div_dispo.append("h2")
+            .text(null);
+
+    }
+    else {
+        carte.div_type.select("svg").remove();
+        //svg pour la légende
+        var svg_legende = carte.div_type.append("svg")
+            .attr("width", 800)
+            .attr("height", carte.Legend.heightLegend);
 
 // Légende pour la carte choroplèthe
-    svg_legende.append("text")
-        .attr("x", 20)
-        .attr("y", 30 )
-        .text(titre_leg);
+        svg_legende.append("text")
+            .attr("x", 20)
+            .attr("y", 30)
+            .text(titre_leg);
 
-    var legend = svg_legende.selectAll("g.legend")
-        .data(color_domain)
-        .enter()
-        .append("g")
-        .attr("class", "legend");
+        var legend = svg_legende.selectAll("g.legend")
+            .data(color_domain)
+            .enter()
+            .append("g")
+            .attr("class", "legend");
 
-    legend.append("rect")
-        .attr("x", 20)
-        .attr("y", function (d, i) {
-            return carte.Legend.heightLegend - (i * ls_h) - 2 * ls_h;
-        })
-        .attr("width", ls_w)
-        .attr("height", ls_h)
-        .style("fill", function (d, i) {
-            return color(d);
-        })
-        .style("stroke", "gray")
-        .style("stroke-width", 0)
-        .style("opacity", 0.8);
 
-    legend.append("text")
-        .attr("x", 50)
-        .attr("y", function (d, i) {
-            return carte.Legend.heightLegend - (i * ls_h) - ls_h - 4;
-        })
-        .text(function (d, i) {
-            return legend_labels[i];
-        });
+        legend.append("rect")
+            .attr("x", 20)
+            .attr("y", function (d, i) {
+                return carte.Legend.heightLegend - (i * ls_h) - 2 * ls_h;
+            })
+            .attr("width", ls_w)
+            .attr("height", ls_h)
+            .style("fill", function (d, i) {
+                return color(d);
+            })
+            .style("stroke", "gray")
+            .style("stroke-width", 0)
+            .style("opacity", 0.8);
 
+        legend.append("text")
+            .attr("x", 50)
+            .attr("y", function (d, i) {
+                return carte.Legend.heightLegend - (i * ls_h) - ls_h - 4;
+            })
+            .text(function (d, i) {
+                return legend_labels[i];
+            });
+        carte.div_dispo.append("h2")
+            .text(carte.Legend.sousTitre);
+    }
     /*--------------Deuxieme partie : sous-titre, description, checkBox--------------------- */
-    carte.div_dispo.append("h2")
-        .text(carte.Legend.sousTitre);
     carte.div_dispo.append("p")
         .html("Année : " + carte.annee + "<br/>" + carte.Legend.description);
     //Ajout d'une checkBox pour arreter de syncroniser les zoom
@@ -70,22 +147,6 @@ var dessin_Legend = function(carte) {
         .attr("for", "checkZoom" + carte.id)
         .text("Désynchroniser le zoom");
 
-    // Pour résoudre un probleme d'affichage, on applique directement les modification sur la légende dans
-    // le cas ou le type d'organisation est "Dessous".
-    if (getOrgaLegend() == "Dessous") {
-        //Reorganisation de la légende au cas ou elle à été modifiée par d'autre dispostion.
-        carte.div_legend
-            .style("width", carte.div_carte.style("width"))
-            .style("height", 90 + "px")
-            .style("visibility", "visible")
-            .style("margin-top", (parseFloat(carte.div_carte.style("height")) - 100) + "px");
-        carte.div_type.style("height", carte.div_legend.style("height"));
-        carte.div_type.select("svg").attr("height", 80);
-        carte.div_type.select("svg").select("g").attr("transform", "translate(0,-22)");
-        carte.div_dispo.select("h2").text(null);
-        carte.div_dispo.style("margin-top", 0 + "px")
-            .style("margin-left", 170 + "px");
-    }
 };
 
 /**
