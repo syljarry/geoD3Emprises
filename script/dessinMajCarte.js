@@ -19,7 +19,7 @@ var dessin_Legend = function(carte) {
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
-            .attr("width", 800)
+            .attr("width", 300)
             .attr("height", 70);
 
         var legend = svg_legende.selectAll("g.legend")
@@ -94,7 +94,7 @@ var dessin_Legend = function(carte) {
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
-            .attr("width", 800)
+            .attr("width", 200)
             .attr("height", carte.Legend.heightLegend);
 
 // Légende pour la carte choroplèthe

@@ -180,7 +180,8 @@ function designCarte(carte) {
         dessin_carte(carte);
     }
     /**
-     * Permet le centrage des cartes en modifiant l'élément "g_centre" de chaque carte.
+     * Permet le centrage des cartes, lors d'ajout ou suppression des cartes,
+     * en modifiant l'élément "g_centre" de chaque carte.
      * @param x
      *          centrage sur la coordonnée x
      * @param y
@@ -414,7 +415,7 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
-            .attr("width", 800)
+            .attr("width", 300)
             .attr("height", 70);
 
         var legend = svg_legende.selectAll("g.legend")
@@ -487,7 +488,7 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
-            .attr("width", 800)
+            .attr("width", 200)
             .attr("height", carte.Legend.heightLegend);
 // Légende pour la carte choroplèthe
         svg_legende.append("text")
