@@ -17,7 +17,7 @@ var categories = ["_allcats", "_farming", "_biota", "_boundaries", "_climatology
     "_elevation", "_environment", "_geoscientificInformation", "_health", "_imageryBaseMapsEarthCover",
     "_intelligenceMilitary", "_inlandsWaters", "_location", "_oceans", "_planningCadastre", "_society",
     "_structure", "_transportation", "_utilitiesCommunication", "_null"];
-var nomCategories = ["Toute catégories", "Agréculture", "Biote", "Limites", "Climatologie/Météorologie/Atmosphère", "Economie",
+var nomCategories = ["Toute catégories", "Agriculture", "Biote", "Limites", "Climatologie/Météorologie/Atmosphère", "Economie",
     "Altitude", "Environnement", "Informations géoscientifiques", "Santé", "Imagerie/Cartes de base/Occupation des terres",
     "Renseignement/Secteur militaire", "Eaux intérieures", "Localisation", "Océans", "Planification/Cadastre",
     "Société", "Structure", "Transport", "Services d'utilité publique/Communication", "Catégories sans nom"];
