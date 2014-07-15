@@ -1,6 +1,6 @@
 /**
  * Fonctions permettant de dessiner les cartes après leur mise en page.
- * Dessin des pays, du planisphere (cercle autour représentant la surface du globe) et des cercles.
+ * Dessin des pays, du planisphere (cercle autour représentant la surface du globe) et des cercles/emprises.
  * Mise a jour des dessins, utilisé lors du changement de donnée ou d'année.
  *
  * @author Sylvain JARRY
@@ -16,6 +16,7 @@
 var dessin_Legend = function(carte) {
     /*--------------Premiere partie : titre, type, svg légende--------------------- */
     if (getOrgaLegend() == "Dessous") {
+        //si l'organisation est dessous, on est obligé de redessiner la légende.
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
@@ -28,9 +29,10 @@ var dessin_Legend = function(carte) {
             .append("g")
             .attr("class", "legend");
 
-        var compteur = 0;
-        var etage = 0;
-        var colonne = -1;
+        //initialisation de compteurs, pour compter le nombre de carré par colonne
+        var compteur = 0; //nombre de carré par colonne
+        var etage = 0;  //permet le décalage en x selon le nombre de carré.
+        var colonne = -1; //permet le décalage en y des carré.
         legend.append("rect")
             .attr("x", function () {
                 if (compteur > 2) {
@@ -59,7 +61,7 @@ var dessin_Legend = function(carte) {
             .style("stroke", "gray")
             .style("stroke-width", 0)
             .style("opacity", 0.8);
-
+        //meme technique pour placer le texte(description) de chaque carré.
         compteur = 0;
         etage = 0;
         colonne = -1;
@@ -91,13 +93,14 @@ var dessin_Legend = function(carte) {
 
     }
     else {
+        //sinon on dessine normalement la légende a gauche de la carte.
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
             .attr("width", 200)
             .attr("height", carte.Legend.heightLegend);
 
-// Légende pour la carte choroplèthe
+        // Légende pour la carte choroplèthe
         svg_legende.append("text")
             .attr("x", 20)
             .attr("y", 30)
@@ -108,7 +111,6 @@ var dessin_Legend = function(carte) {
             .enter()
             .append("g")
             .attr("class", "legend");
-
 
         legend.append("rect")
             .attr("x", 20)
@@ -146,7 +148,6 @@ var dessin_Legend = function(carte) {
     carte.div_dispo.append("label")
         .attr("for", "checkZoom" + carte.id)
         .text("Désynchroniser le zoom");
-
 };
 
 /**
@@ -163,7 +164,7 @@ var maj_Legend = function(carte) {
 
 /**
  * Dessine les pays (utilisé pour dessiner la carte la 1ère fois)
- * Associe une couleur différente a un pay si des données le concerne ou non
+ * Associe une couleur différente a un pays si des données le concerne ou non
  *
  * @param json
  *              fichier json comprenant la position des pays
@@ -180,15 +181,6 @@ var dessin_pays = function (json, carte) {
         .append("path")
         .attr("d", path)
         .attr("class", "cl_pays")
-        // si volontaires pour le pays, ce pays prend une couleur différente
-        /*.style("fill", function (d) {
-            // Get data value
-            var value = d.properties[carte.dispo + carte.annee];
-            if (value) {
-                // If value exists…
-                return couleur_data;
-            }
-        })*/
         .on("click", function (d) {
             return toolTipShow(d, carte);
         })
@@ -230,113 +222,18 @@ var maj_pays = function (json, carte) {
     pays.transition()
         .duration(duree_transition)
         .attr("d", path);
-        /* si volontaires pour le pays, ce pays prend une couleur différente */
-        /*.style("fill", function (d) {
-            // Get data value
-            var value = d.properties[carte.dispo + carte.annee];
-            if (value) {
-                // If value exists…
-                return couleur_data;
-            } else {
-                return couleur_nodata;
-            }
-
-        });*/
-};
-
-
-/**
- *  Dessin des cercles proportionnels (utilisé pour dessiner la carte la 1ère fois)
- *  Affiche des cercles sur chaque pays suivant les données passés en parametre.
- *
- * @param json
- *              fichier json comprenant la positions des pays.
- * @param carte
- *              Objet carte pour lequel on veut dessiner les cercles.
- */
-var dessin_cercles = function (json, carte) {
-    //desactive les event souris pour afficher correctement le toolTip sur les pays.
-    carte.circlegroupe.style("pointer-events", "none");
-    /* joint les données (data) dans l ordre du code iso2,
-     qui sert de clé (sinon problème car cercles triés ensuite par taille)
-     */
-    var circles = carte.circlegroupe
-        .selectAll("circles")
-        .data(json.features, function (d) {
-            return d.properties[colonne_code];
-        });
-    //dessin des cercles.
-    var circle = circles.enter();
-    circle.append("circle")
-        .attr("cx", function (d) {
-            var centroid = path.centroid(d);
-            return centroid[0];
-        })
-        .attr("cy", function (d) {
-            var centroid = path.centroid(d);
-            return centroid[1];
-        })
-        /* calcule le rayon du cercle pour que la surface varie avec la valeur */
-        .attr("r", function (d) {
-            var nbvol = d.properties[carte.dispo + carte.annee];
-            return calc_rayon(nbvol);
-        })
-        /* si la valeur est suffisamment importante, vide le cercle pour qu on ne voit que le contour */
-        .attr("class", function (d) {
-            var value = d.properties[carte.dispo + carte.annee];
-            if (value > evide) {
-                return "gros";
-            }
-        })
-        .attr("id", "circlemap")
-        /* trie les cercles en fonction du nb de vol pour mettre les + petits devant */
-        .sort(function (a, b) {
-            return b.properties[carte.dispo + carte.annee] - a.properties[carte.dispo + carte.annee];
-        });
 };
 
 /**
- *  Mise à jour des cercles proportionnels (avec transition)
- *  Change le rayon des cercles suivant les nouvelles données.
- *
- * @param json
- *              fichier json comprenant la positions des pays.
+ * Dessin des emprises (utilisé pour dessiner la carte la 1ère fois)
+ * Affiche des rectangles selon les données contenues dans les fichiers indiqué
+ * dans les parametres.
  * @param carte
- *              Objet carte pour lequel on veut mettre a jour les cercles
+ *          Objet cartes sur lequel on dessine les emprises.
  */
-var maj_cercles = function (json, carte) {
-    /* joint les données (data) dans l ordre du code iso2, qui sert de clé (sinon problème car cercles triés ensuite par taille) */
-    var circle = carte.circlegroupe.selectAll("circle")
-        .data(json.features, function (d) {
-            return d.properties[colonne_code];
-        });
-    /* la suite... */
-    circle.transition()
-        .duration(duree_transition)
-        /* calcule le rayon du cercle pour que la surface varie avec la valeur */
-        .attr("r", function (d) {
-            var nbvol = d.properties[carte.dispo + carte.annee];
-            return calc_rayon(nbvol);
-        })
-        /* si la valeur est suffisamment importante, vide le cercle pour qu on ne voit que le contour */
-        .attr("class", function (d) {
-            var value = d.properties[carte.dispo + carte.annee];
-            if (value > evide) {
-                return "gros";
-            }
-        })
-        /* trie les cercles en fonction du nb de vol pour mettre les + petits devant */
-        .sort(function (a, b) {
-            return b.properties[dispo + annee] - a.properties[dispo + annee];
-        });
-};
-
-
 var dessin_emprise = function(carte) {
-
-
-    var pathFile = acronymePays + getYearFolder(carte.annee);
-    var file = path_data + pathFile + "/" + pathFile + carte.dispo + ".json";
+    var pathFile = acronymePays + getYearFolder(carte.annee); //chemin d'accé aux dossiers
+    var file = path_data + pathFile + "/" + pathFile + carte.dispo + ".json"; //chemin d'accé aux fichiers
 
     // affiche les emprises
     d3.json(file, function (json) {
@@ -352,7 +249,7 @@ var dessin_emprise = function(carte) {
             })
             .style("stroke", "gray")
             .style("stroke-width", stroke_width_empr)
-            // trie les emprise en fonction du nb
+            // trie les emprise en fonction du nb, met les plus petit devant.
             .sort(function (a, b) {
                 return b.properties[col_valeur] - a.properties[col_valeur];
             });
@@ -360,10 +257,15 @@ var dessin_emprise = function(carte) {
 
 };
 
+/**
+ * Met a jour les emprises, utilisé lorsque l'utilisateur choisi une nouvelle
+ * donnée dans la liste disponible sous chaque carte.
+ * @param carte
+ *          Objet carte sur lequel mettre a jour les emprises.
+ */
 var maj_emprise = function(carte) {
-
-    var pathFile = acronymePays + getYearFolder(carte.annee);
-    var file = path_data + pathFile + "/" + pathFile + carte.dispo + ".json";
+    var pathFile = acronymePays + getYearFolder(carte.annee); //chemin d'accé aux dossiers
+    var file = path_data + pathFile + "/" + pathFile + carte.dispo + ".json"; //chemin d'accé aux fichiers
 
     //supprime les anciennes emprises.
     carte.emprisesgroupe.selectAll("path").remove();
@@ -391,6 +293,7 @@ var maj_emprise = function(carte) {
                 .html("");
         }
         else{
+            //si le fichier n'existe pas on l'indique à l'utilisateur.
             carte.div_carte.select("span")
                 .html("<b>Donnée non disponible !</b>")
                 .style("color", "red");
@@ -419,23 +322,17 @@ var dessin_carte = function (carte) {
         //ajout d'un bouton supprimer et de la liste des noms des données.
         configurationCarte(carte);
 
-        /* Chargement des données CSV */
-        //d3.csv(path_csv, function (data) {
             /* Chargement des données JSON */
             d3.json(path_json, function (json) {
-                /* lie les données CSV pour l année et le dispositif en cours */
-                //bind_csv_json(data, json, carte.annee, carte.dispo);
                 //affiche la légende
                 dessin_Legend(carte);
+                //affiche les emprises.
                 dessin_emprise(carte);
                 /* affiche les pays, couleur en fonction année et dispositif en cours */
                 dessin_pays(json, carte);
-                /* dessine les cercles, en fonction année et dispositif en cours */
-                //dessin_cercles(json, carte);
                 //Synchronise le zoom avec la premiere carte si besoin
                 synchroZoom(carte);
             });
-       // });
         carte.isShown = true;
     }
 };
@@ -449,20 +346,12 @@ var dessin_carte = function (carte) {
  *              Objet carte que l'on veut mettre à jour.
  */
 var maj_carte = function (carte) {
-    /* Chargement des données CSV */
-    //d3.csv(path_csv, function (data) {
         /* Chargement des données JSON */
         d3.json(path_json, function (json) {
-            /* lie les données CSV pour l année et le dispositif en cours */
-           // bind_csv_json(data, json, carte.annee, carte.dispo);
             maj_emprise(carte);
             /* met à jour les pays, couleur en fonction année et dispositif en cours */
             maj_pays(json, carte);
-            /* met à jour les cercles, en fonction année et dispositif en cours */
-            maj_cercles(json, carte);
-
         });
-    //})
 };
 
 /**
@@ -492,7 +381,6 @@ function configurationCarte(carte){
             //met a jour la légende et la carte correspondante.
             maj_Legend(carte);
             maj_carte(carte);
-
         });
     //ajout des options pour la liste déroulante.
     for(var i = 0; i<nomCategories.length; i++) {
@@ -500,6 +388,7 @@ function configurationCarte(carte){
             .attr("value", nomCategories[i])
             .text(nomCategories[i]);
     }
-    //ajout d'un span pour afficher des informations.
+    //ajout d'un span pour afficher des informations, par exemple lorsqu'un fichier selectionné
+    // par l'utilisateur n'existe pas.
     carte.div_carte.append("span");
 }

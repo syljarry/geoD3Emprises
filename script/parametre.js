@@ -6,7 +6,6 @@
  */
 /* variables à adapter par l utilisateur */
 var path_json = "data/fond_pays.json"; // chemin du fond de carte JSON rapport au fichier html
-var path_csv = "data/donnees.csv"; // chemin des données CSV par rapport au fichier html
 var path_data = "data/";
 var colonne_code = "iso_a2"; // nom de la colonne contenant le code permettant de joindre le fond de carte JSON et les données CSV (ex. : "iso_a2" pour le code ISO 2)
 var acronymePays = "bo";
@@ -21,20 +20,6 @@ var nomCategories = ["Toute catégories", "Agriculture", "Biote", "Limites", "Cl
     "Altitude", "Environnement", "Informations géoscientifiques", "Santé", "Imagerie/Cartes de base/Occupation des terres",
     "Renseignement/Secteur militaire", "Eaux intérieures", "Localisation", "Océans", "Planification/Cadastre",
     "Société", "Structure", "Transport", "Services d'utilité publique/Communication", "Catégories sans nom"];
-var racine_tot = "TOT_";	// nom de la colonne avec nb volontaires totaux, sans l'année ("TOT_" si la colonne s'appelle "TOT_2011" pour 2011, "TOT_2012" pour 2012 etc.)
-var racine_sci = "SCI_";	// nom de la colonne avec nb volontaires SCI, sans l'année ("TOT_" si la colonne s'appelle "TOT_2011" pour 2011, "TOT_2012" pour 2012 etc.)
-var racine_sve = "SVE_";	// nom de la colonne avec nb volontaires SVE, sans l'année ("TOT_" si la colonne s'appelle "TOT_2011" pour 2011, "TOT_2012" pour 2012 etc.)
-var racine_vp = "VP_";	// nom de la colonne avec nb volontaires VP, sans l'année ("TOT_" si la colonne s'appelle "TOT_2011" pour 2011, "TOT_2012" pour 2012 etc.)
-var racine_vsi = "VSI_";	// nom de la colonne avec nb volontaires VSI, sans l'année ("TOT_" si la colonne s'appelle "TOT_2011" pour 2011, "TOT_2012" pour 2012 etc.)
-var tableauNomDonnee = ["Tous", "SCI", "SVE", "VP", "VSI"]; //tableau contenant les noms de chacune des données, l'ordre doit correspondre à celui de la déclaration des données
-var tableauDescription = ["Tous les dispositifs de volontariat sont représentés.",
-    "SCI : description",
-    "SVE : description",
-    "VP : description",
-    "VSI : description"
-];	//tableau contenant les descriptions pour chaque dispo, l'ordre doit correspondre à celui de la déclaration des variables
-var couleur_data = "#ccc";	// couleur des pays avec volontaires
-var couleur_nodata = "#eee";	// couleur des pays sans volontaires
 // pour la discrétisation des emprises MD
 var col_valeur = "nb"; // nom de la colonne des json avec la valeur à représenter
 var color_domain = [16, 30, 198, 224, 230, 250, 268, 296, 318]; // bornes pour la discrétisation
@@ -58,10 +43,8 @@ var color = d3.scale.threshold()
 // largeur des bordures de pays et des emprises
 var stroke_width_pays = 1;
 var stroke_width_empr = 0;
-var evide = 100;	// nb de volontaires à partir duquel le cercle est évidé
 var duree_transition = 1000;	// durée de la transition en millisecondes quand on change de données à afficher
 var duree_transition2 = 500;    //durée de la transition lors du repositionnement des cartes.
-var Legend_cp = [12, 98, 250, 421]; // liste des valeurs à afficher dans la légende de la carte en cercles proportionnels
 var legend_labels = ["1 - 16", "16 - 30", "30 - 198", "198 - 224", "224 - 230", "230 - 250", "250 - 268", "268 - 296", "296 - 318"] // étiquettes de la légende
 var titre_leg = "Nombre emprises :"; // titre de la légende
 var sous_titre_leg = "Description :";
@@ -133,8 +116,6 @@ projection
  *          Groupe pour afficher les pays et les cercles
  * @param planigroupe
  *          Groupe pour afficher le planisphere
- * @param circlegroupe
- *          Groupe pour afficher les cercles proportionnels en fonctions des données.
  * @param emprisesgroupe
  *          Groupe pour dessiner les emprises sur un pays.
  * @param isShown
@@ -162,7 +143,7 @@ projection
  * @constructor
  */
 function Carte(id, Legend, annee, dispo, svg_map,
-               cartogroupe, planigroupe, circlegroupe, emprisesgroupe, isShown, div_map, div_legend,
+               cartogroupe, planigroupe, emprisesgroupe, isShown, div_map, div_legend,
                div_type, div_dispo, div_carte, synchro, zoom, scaleX, scaleY, toolTip) {
 
     this.id = id;
@@ -172,7 +153,6 @@ function Carte(id, Legend, annee, dispo, svg_map,
     this.svg_map = svg_map;
     this.cartogroupe = cartogroupe;
     this.planigroupe = planigroupe;
-    this.circlegroupe = circlegroupe;
     this.emprisesgroupe = emprisesgroupe;
     this.isShown = isShown;
     this.div_map = div_map;
@@ -195,8 +175,6 @@ function Carte(id, Legend, annee, dispo, svg_map,
  *          Sous titre de la légende(comprend la deuxieme partie)
  * @param type
  *          description du type de carte représenté
- * @param donneeLegend
- *          données de la légende.
  * @param description
  *          description des données affichées
  * @param widthLegend
@@ -205,11 +183,10 @@ function Carte(id, Legend, annee, dispo, svg_map,
  *          hauteur du svg de la légende
  * @constructor
  */
-function Legend(titre, sousTitre, type, donneeLegend, description, widthLegend, heightLegend) {
+function Legend(titre, sousTitre, type, description, widthLegend, heightLegend) {
     this.titre = titre;
     this.sousTitre = sousTitre;
     this.type = type;
-    this.donneeLegend = donneeLegend;
     this.description = description;
     this.widthLegend = widthLegend;
     this.heightLegend = heightLegend;

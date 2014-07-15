@@ -31,7 +31,7 @@ var getOrga = function () {
  * Renvoi le type d'organisation des légendes choisis par l'utilisateur.
  *
  * @returns {string}
- *          Gauche : legend situé a gauche
+ *          Gauche : légende situé a gauche
  *          Unique : Une seul légende sur la premiere carte.
  *          Dessous : Legende situé en dessous.
  */
@@ -49,31 +49,13 @@ var getOrgaLegend = function() {
         return "Dessous";
     }
 };
-/**
- * Renvoi le type de disposition des données actuelement sélectionné.
- *
- * @returns {string}
- */
-var getDispo = function (dispo) {
-    if (dispo == "Tous") {
-        return racine_tot;
-    }
-    if (dispo == "SCI") {
-        return racine_sci;
-    }
-    if (dispo == "SVE") {
-        return racine_sve;
-    }
-    if (dispo == "VP") {
-        return racine_vp;
-    }
-    if (dispo == "VSI") {
-        return racine_vsi;
-    }
-};
 
 /**
- *
+ *  Cherche et retourne le nom du chemin d'accé à la catégorie passer en parametre.
+ *  @param cat
+ *      nom de la catégorie selectionné par l'utilisateur.
+ *  @return {string}
+ *          chemin d'accé au fichier de la catégorie selectionné par l'utilisateur.
  */
 function getCategories(cat){
     //cherche l'index dans le tableau des nom
@@ -87,50 +69,16 @@ function getCategories(cat){
 var getYear = function () {
     return d3.select(".yearselect").text();
 };
-
+/**
+ * Cherche et retourne le chemin d'accé au fichier de l'année passer en parametre.
+ * @param year
+ *      année selectionné par l'utilisateur.
+ * @returns {string}
+ *      chemin d'accé au fichier de l'année corespondante
+ */
 var getYearFolder = function(year){
     return anneeFolder[annees_labels.indexOf(year)];
 };
-
-//fonction provisoire retournant le type de Legend selectionné
-var getLegend = function() {
-    return Legend_cp;
-};
-//fonction provisoire permettant de récupérer la description selon le type de données selectionné
-var getDescription = function(dispo) {
-    switch (dispo) {
-        case(racine_tot):
-            return tableauDescription[0];
-            break;
-        case(racine_sci):
-            return tableauDescription[1];
-            break;
-        case(racine_sve):
-            return tableauDescription[2];
-            break;
-        case(racine_vp):
-            return tableauDescription[3];
-            break;
-        case(racine_vsi):
-            return tableauDescription[4];
-            break;
-        default:
-            break;
-    }
-};
-/**
- *  Calcul du rayon des cercles proportionnels de la carte en fonction
- *  des valeurs donnés en paramettres.
- *
- * @param d
- *          valeur de la donnée
- * @returns {number}
- *          rayon du cercle correspondant à la donnée
- */
-var calc_rayon = function (d) {
-    return 3 * Math.sqrt(d / Math.PI);
-};
-
 /**
  * Cherche la position dans le tableau de carte,
  * de l'objet carte qui correspond a l'id passer en parametre.

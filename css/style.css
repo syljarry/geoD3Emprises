@@ -1,15 +1,15 @@
 /*	________________________
-	|       Chapeau         |
-	|_______________________|
+	| Info|      Chapeau    |
+	|_____|_________________|
 	| menuleft |  menuright | m
 	|__________|____________| e
 	|      Y  e  a  r     | | n
 	|_______________________| u
     |                       |
-    |                       |
-    |          map          |
-    |                       |
-    |_______________________|
+    |                       | m
+    |          map          | a
+    |                       | i
+    |_______________________| n
 */
 
 
@@ -58,7 +58,7 @@ select {
 	width:100%;
 	height:100%;
 }
-/* class contenant chapeau et menu, permet un bandeau fixe en haut de la fenetre */
+/* class contenant chapeau, menu et info, permet un bandeau fixe en haut de la fenetre */
 .bandeauFix {
     position: fixed;
     z-index: 10;
@@ -134,18 +134,15 @@ select {
     font-size: 0.9em;
     z-index: 1;
 }
-
 .type {
     position: absolute;
     height: 210px;
 }
-
 .dispo {
     position: absolute;
     margin-top: 210px;
     height: 170px;
 }
-
 .carte {
     position: absolute;
     margin-left: 210px;
@@ -153,20 +150,16 @@ select {
     border: 0 solid #eee;
     border-right-width: 2px;
 }
-
-
 .rmt{
 }
 .rd{
 }
-
 /* style des limites du planisphère */
 .plani {
   stroke: darkgray;
   stroke-width: 1px;
   fill: none;
 }
-
 /* style de base des emprises */
 .cl_emprises {
     opacity: 1;
@@ -176,7 +169,6 @@ select {
     fill: none;
     pointer-events: all;
 }
-
 /* style de base des pays */
 .cl_pays {
     fill: none;
@@ -233,7 +225,6 @@ line.Legend{
 text.Legend{
 	fill: #323232;
 }
-
 /* pour les boutons radio : http://viralpatel.net/blogs/css-radio-button-checkbox-background/ */
 input[type=radio] {
 	display:none;
@@ -272,7 +263,6 @@ input[type=radio]:checked + label {
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
     background: #e0e0e0 none;
 }
-
 div.tooltip {
     position: absolute;
     text-align: center;

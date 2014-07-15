@@ -2,7 +2,7 @@
  * Comprend toute les fonctions neccessaires à la création et à la mise en page des
  * cartes en tant qu'objet. Pas de desssin.
  * Ici est créé l'objet carte, qui est placé dans le tableauCarte.
- * La disposition des cartes en liste, grille(2*2), ou colonne(3*1) est gérée ici.
+ * La disposition des cartes en liste, grille, ou colonne est gérée ici.
  * La disposition de la légende à gauche, dessous, ou Unique est gérée ici.
  *
  * @author Sylvain JARRY
@@ -10,12 +10,14 @@
 
 /**
  * Création d'une nouvelle carte (objet Carte) et ajout dans le tableau des cartes.
+ * On initialise toutes les variables de l'objet carte ici.
  */
 
 function creationNewCarte() {
     var id = compteurCarte;
 
     /* création de la mise en page avec des div
+     Schema de l'organisation des div :
      <div main>
      <div map>
      <div Legend>
@@ -60,19 +62,20 @@ function creationNewCarte() {
     var titre = titre_leg;
     var sousTitre = sous_titre_leg;
     var type = type_leg;
-    var donneeLegend = getLegend();
     var description = nomCategories[0] ;
     /* Width and height for the legend*/
     var widthLegend = 150;
     var heightLegend = 240;
-    var legend = new Legend(titre, sousTitre, type, donneeLegend, description, widthLegend, heightLegend);
+    var legend = new Legend(titre, sousTitre, type, description, widthLegend, heightLegend);
 
     /* -------------Création d'un objet Carte---------------------*/
     //attribution de l'annee en cour et du type de dispo selectionné
     var annee = getYear();
     var dispo = getCategories(nomCategories[0]);
 
-    /*Création des échelles pour le zoom sémantique. */
+    /*Création des échelles pour le zoom sémantique.
+    * Ajouter le domain et le range ne change rien, je les laissent donc en commentaire.
+    */
     var scaleX = d3.scale.linear(),//.domain([0, position.w]).range([0, position.w]),
         scaleY = d3.scale.linear();//.domain([0, position.h]).range([0, position.h]);
 
@@ -101,16 +104,11 @@ function creationNewCarte() {
         .attr("height", screen.height);
 
     //création des groupes
-
-
-
     var emprisesgroupe = g_node.append("g").attr("id", "g_emprises");
 
     var cartogroupe = g_node.append("g").attr("id", "g_carte");
 
     var planigroupe = g_node.append("g").attr("id", "g_plani");
-
-    var circlegroupe = g_node.append("g").attr("id", "g_cercle");
 
     //la carte n'est pas encore affiché
     var isShown = false;
@@ -119,7 +117,7 @@ function creationNewCarte() {
 
     //ajout d'un objet carte dans la liste des cartes
     var carte = new Carte(id, legend, annee, dispo, svg_map,
-        cartogroupe, planigroupe, circlegroupe, emprisesgroupe, isShown, div_map, div_legend, div_type,
+        cartogroupe, planigroupe, emprisesgroupe, isShown, div_map, div_legend, div_type,
         div_dispo, div_carte, synchro, zoom, scaleX, scaleY, toolTip);
 
     tableauCarte.push(carte);
@@ -130,12 +128,12 @@ function creationNewCarte() {
 }
 
 /**
- * Effectue une organisation des cartes, soit à l'initialisation lors de
- * l'ajout d'une nouvelle carte, soit selon l'organisation
- * choisies par l'utilisateur.
+ * Effectue une organisation des cartes, cette fonction est appelé à chaque changement
+ * effectué par l'utilisateur, ajout/supression carte ou changement d'organisation.
+ * On regarde dans qu'elle organisation des cartes on est, et on appelle la fonction correspondante
  *
  * @param carte
- *            Nouvelle carte à dessiner.
+ *            Nouvelle carte à dessiner si besoin.
  */
 function designCarte(carte) {
     if (tableauCarte.length == 1) {
@@ -199,34 +197,36 @@ function designCarte(carte) {
 /**
  * Permet une mise en liste des cartes. Les cartes sont disposées les unes à la suite des autres.
  * La taille des cartes est proportionnelle à la résolution de l'écran, de maniere
- * a avoir au moins 2 cartes par pages.
+ * à avoir au moins 2 cartes par pages/ecran.
  */
 function designCarteListe() {
     //Récupere la taille de l'écran de l'utilisateur moins un certain padding
     var w = screen.width - (screen.width / 9.5);
     var h = (screen.height - (screen.height / 3)) / 2;
-    compteur = 0;
-    etage = 0;
+    var compteur = 0;
+    var etage = 0;
     for (var i = 0; i < tableauCarte.length; i++) {
         miseEnPageCarte(tableauCarte[i], w, h, compteur, etage);
+        //a chaque tour de boucle on incrémente etage pour faire descendre d'un cran la
+        //prochaine carte.
         etage++;
     }
 }
 
 /**
  * Permet une mise en forme des cartes en grilles. La taille de cartes est
- * proportionnelle à la résolution de l'écran, de maniere a avoir deux cartes
+ * proportionnelle à la résolution de l'écran, de maniere à avoir deux cartes
  * par ligne et par colonne. Donc 4 cartes par pages.
- * Les deux variable compteur et etage sont utilisé pour savoir si on
- * à atteint deux cartes sur un meme étage. Une fois atteint on descend d'un étage.
+ * Les deux variables compteur et etage sont utilisées pour savoir si on
+ * a atteint deux cartes sur un meme étage. Une fois atteint on descend d'un étage.
  *
  */
 function designCarteGrille() {
     //Récupere la taille de l'écran de l'utilisateur moins un certain padding.
     var w = (screen.width - (screen.width / 19.5)) / 2;
     var h = (screen.height - (screen.height / 3)) / 2;
-    compteur = 0;
-    etage = 0;
+    var compteur = 0;
+    var etage = 0;
     for (var i = 0; i < tableauCarte.length; i++) {
         if (tableauCarte.length == 2) {
             //Si on a que deux carte, on prend toute la hauteur
@@ -241,17 +241,19 @@ function designCarteGrille() {
     }
 }
 
+
 /**
  * Permet une mise en forme des cartes en colonne, les cartes
  * sont disposé en colonne de 3 par pages.
- * La taille des cartes est calculé en fonctiond ela résolution de l'écran
+ * La taille des cartes est calculé en fonctiond de la résolution de l'écran
+ * Le principe est le même que pour designCarteGrille()
  */
 function designCarteColonne() {
     //Récupere la taille de l'écran de l'utilisateur moins un certain padding.
     var w = (screen.width - (screen.width / 19.5)) / 3;
     var h = (screen.height - (screen.height / 3));
-    compteur = 0;
-    etage = 0;
+    var compteur = 0;
+    var etage = 0;
 
     for (var i = 0; i < tableauCarte.length; i++) {
         if (tableauCarte.length == 2) {
@@ -271,8 +273,8 @@ function designCarteColonne() {
 /**
  * Permet la mise en page des cartes pour les fonctions designListe, designCarteGrille et
  * designCarteColonne.
- * Appele ensuite la fonciton miseEnPageLegend pour mettre en forme la légende de chauqe carte.
- * Applique un padding top ou left selon la disposition et les valeurs en parametre.
+ * Appele ensuite la fonction miseEnPageLegend pour mettre en forme la légende de chaque carte.
+ * Applique un padding top ou left selon la disposition et les valeurs de compteur et etage.
  * Applique la taille des cartes en fonction de la taille passer en parametre.
  *
  * @param carte
@@ -282,7 +284,7 @@ function designCarteColonne() {
  * @param h
  *         Hauteur à appliquer sur les différents éléments.
  * @param compteur
- *          nombre de carte, sert pour les doublets ou triplets
+ *          Compte le nombre d'appel a la fonction, sert pour les doublets ou triplets
  *          de carte afin d'appliquer la bonne marge ou incrémenter l'étage.
  * @param etage
  *          augmente la marge en hauteur pour faire descendre les cartes quand le compteur est atteint.
@@ -294,7 +296,7 @@ function miseEnPageCarte(carte, w, h, compteur, etage) {
         })
         .style("width", w + "px");
     if (compteur > 0) {
-        //on ajoute une marge d'un tier de l'écran a chaque nouvelle carte de la ligne.
+        //on ajoute une marge gauche au nouvelle carte d'une meme ligne.
         carte.div_map.transition().duration(duree_transition2)
             .style("margin-left", function () {
                 return (w * compteur) + "px";
@@ -326,15 +328,18 @@ function miseEnPageCarte(carte, w, h, compteur, etage) {
  *         Type de position selectionner : Gauche, Unique ou Dessous.
  */
 function miseEnPageLegende(carte, h, w, position) {
-    var wcarte, marcarte, wsvg;
+    //Pour éviter la ducplication de code, on stock les parametres de taille que l'on veut appliquer
+    //puis on appelle une fonction interne avec ces paramètres.
+    //Ces parametre servent a définir une nouvelle taille de carte, pour s'accorder avec celle de la légende.
+    var wcarte; //largeur de la carte
+    var marcarte; //marge gauche de la carte
     if (position == "Gauche") {
         internConfigLegend();
         internConfigLegendGauche();
         //Modification de la taille de la carte par les parametre donné moins la taille de la légende.
         wcarte = w - parseFloat(carte.div_legend.style("width"));
         marcarte = 9 + parseFloat(carte.div_legend.style("width"));//+9 de padding pour afficher entierement le bouton "supprimer".
-        wsvg = w - parseFloat(carte.div_legend.style("width"));
-        internConfigCarte(wcarte, marcarte, wsvg);
+        internConfigCarte(wcarte, marcarte);
     }
     if (position == "Unique") {
         if (carte.id == tableauCarte[0].id) {
@@ -343,8 +348,7 @@ function miseEnPageLegende(carte, h, w, position) {
             //Modification de la taille de la carte par les parametres donné moins la taille de la légende.
             wcarte = w - parseFloat(carte.div_legend.style("width"));
             marcarte = 9 + parseFloat(carte.div_legend.style("width"));//+9 de padding pour afficher entierement la liste des données.
-            wsvg = w - parseFloat(carte.div_legend.style("width"));
-            internConfigCarte(wcarte, marcarte, wsvg);
+            internConfigCarte(wcarte, marcarte);
         }
         else {
             //On cache puis on réduit la légende de la carte.
@@ -353,16 +357,14 @@ function miseEnPageLegende(carte, h, w, position) {
             //Changement de la taile de la carte en fonction de la nouvelle taille de la légende.
             wcarte = w - parseFloat(carte.div_legend.style("width"));
             marcarte = parseFloat(carte.div_legend.style("width"));
-            wsvg = w - parseFloat(carte.div_legend.style("width"));
-            internConfigCarte(wcarte, marcarte, wsvg);
+            internConfigCarte(wcarte, marcarte);
         }
     }
     if (position == "Dessous") {
         //Modification de la taille de la carte par les parametre donné moins la taille de la légende.
         wcarte = w - 20;
         marcarte = 10;
-        wsvg = w - 20;
-        internConfigCarte(wcarte, marcarte, wsvg);
+        internConfigCarte(wcarte, marcarte);
         //Modification de la légende pour l'avoir en dessous.
         carte.div_legend
             .style("width", carte.div_carte.style("width"))
@@ -377,41 +379,52 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_dispo.select("h2").text(null);
         carte.div_dispo.style("margin-top", 0 + "px")
             .style("margin-left", 280 + "px");
-        //!!!!!!!!!!!!!!!!!!!!!!
+        //On est obligé de redessinner la légende.
         interConfigLegendDessous();
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     }
 
+    /**
+     * Reorganisation de la légende par défaut, pour les cas ou elle a été modifée.
+     * Cela permet d'éviter des problemes d'affichage lorsque l'on passe d'une organisation à une autre.
+     */
     function internConfigLegend() {
-        //Reorganisation de la légende par défaut, pour les cas ou elle a été modifée.
         carte.div_legend
             .style("height", h + "px")
             .style("width", 200 + "px")
             .style("visibility", "visible")
             .style("margin-top", 0 + "px");
         carte.div_type.select("h2").text(carte.Legend.titre);
-        carte.div_type.select("p").text(carte.Legend.type);
-        carte.div_type.select("svg").attr("height", carte.Legend.heightLegend + "px");
+        carte.div_type.select("p").text("Ceci est une carte en " + carte.Legend.type);
+        carte.div_type.select("svg").attr("height", carte.Legend.widthLegend + "px");
         carte.div_dispo.select("h2").text(carte.Legend.sousTitre);
         carte.div_dispo.style("margin-top", 210 + "px")
             .style("margin-left", 0 + "px");
     }
 
-    function internConfigCarte(wcarte, marcarte, wsvg) {
-        //Réorganisation de la taille de la carte, la hauteur ne change pas, on prend donc
-        //celle passée en parametre de la fonction mère.
+    /**
+     * Réorganisation de la taille de la carte, la hauteur ne change pas, on garde donc
+     * celle passée en parametre de la fonction mère.
+     * @param wcarte
+     *          largeur de la carte
+     * @param marcarte
+     *          marge gauche de la carte
+     */
+    function internConfigCarte(wcarte, marcarte) {
         carte.div_carte
             .style("height", h + "px")
             .style("width", (wcarte) + "px")
             .style("margin-left", marcarte + "px");
         carte.svg_map.transition().duration(duree_transition2)
-            .attr("width", wsvg)
+            .attr("width", wcarte)
             .attr("height", h);
     }
 
+    /**
+     * Permet de redessiner la légende pour l'avoir en dessous de la carte.
+     * Les carrés sont regroupés en 3 colonnes, avec 3 carrés par colonne
+     */
     function interConfigLegendDessous() {
-        //refonte du svg legende :
+        //suppression de l'ancien svg de la legende :
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
@@ -423,10 +436,10 @@ function miseEnPageLegende(carte, h, w, position) {
             .enter()
             .append("g")
             .attr("class", "legend");
-
-        var compteur = 0;
-        var etage = 0;
-        var colonne = -1;
+        //initialisation de compteurs, pour compter le nombre de carré par colonne
+        var compteur = 0; //nombre de carré par colonne
+        var etage = 0;  //permet le décalage en x selon le nombre de carré.
+        var colonne = -1; //permet le décalage en y des carré.
         legend.append("rect")
             .attr("x", function () {
                 if (compteur > 2) {
@@ -456,6 +469,7 @@ function miseEnPageLegende(carte, h, w, position) {
             .style("stroke-width", 0)
             .style("opacity", 0.8);
 
+        //meme technique pour placer le texte(description) de chaque carré.
         compteur = 0;
         etage = 0;
         colonne = -1;
@@ -468,6 +482,7 @@ function miseEnPageLegende(carte, h, w, position) {
                 else {
                     compteur++;
                 }
+                //si i < 3, on return une marge de 20 + le décalage, sinon juste le décalage.
                 return i < 3 ? 20 + 100 * etage : 100 * etage;
             })
             .attr("y", function () {
@@ -484,13 +499,16 @@ function miseEnPageLegende(carte, h, w, position) {
             });
     }
 
+    /**
+     * Permet de redessiner la légende à gauche lorsqu'elle à été mise en dessous.
+     */
     function internConfigLegendGauche(){
         carte.div_type.select("svg").remove();
         //svg pour la légende
         var svg_legende = carte.div_type.append("svg")
             .attr("width", 200)
             .attr("height", carte.Legend.heightLegend);
-// Légende pour la carte choroplèthe
+        // Légende pour la carte choroplèthe
         svg_legende.append("text")
             .attr("x", 20)
             .attr("y", 30)
@@ -501,7 +519,6 @@ function miseEnPageLegende(carte, h, w, position) {
             .enter()
             .append("g")
             .attr("class", "legend");
-
 
         legend.append("rect")
             .attr("x", 20)
