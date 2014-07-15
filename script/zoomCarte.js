@@ -6,9 +6,11 @@
 
 /**
  * Zoom et pan sur les cartes. zoom avec la molette souris, pan en cliqué glissant souris.
- * Le zoom est synchroniser entre toute les cartes, excepté sur celles dont la case "Désynchroniser" est coché.
+ * Le zoom est synchronisé entre toute les cartes, excepté sur celles dont la case "Désynchroniser" est coché.
  * C'est à dire si synchro = false.
- *
+ * Lors de l'appel de cette fonction, l'objet Carte n'est pas encore créé, on ne peut donc pas l'utiliser pour récuperer
+ * les parametres de la carte. On utilise donc l'id de la carte pour la retrouver dans le tableau des cartes.
+ * Pour une meilleur visualisation on diminu la grosseur du trait des contours des pays en fonction du scale.
  * @param id
  *          identifiant de la carte sur laquelle on clique actuellement.
  */
@@ -28,67 +30,20 @@ function zoomFunction(id) {
 
         var t = d3.event.translate;
         var s = d3.event.scale;
-        /*var width = carte.svg_map.attr("width");
-        var height = carte.svg_map.attr("height");
-
-        t[0] = Math.min(
-                (width / height) * (s - 1),
-            Math.max(height * (1 - s), t[0])
-        );
-
-        t[1] = Math.min(
-            0,
-            Math.max(height * (1 - s), t[1])
-        );
-*/
         carte.planigroupe.attr("transform", "translate(" + t + ")scale(" + s + ")")
             .style("stroke-width", stroke_width_pays / s);
         carte.cartogroupe.attr("transform", "translate(" + t + ")scale(" + s + ")")
             .style("stroke-width", stroke_width_pays / s);
         carte.emprisesgroupe.attr("transform", "translate(" + t + ")scale(" + s + ")")
             .style("stroke-width", stroke_width_empr / s);
+        //Mettre à jour l'instance de zoom, pour résoudre des problemes d'affichage.
         carte.zoom.translate(t).scale(s);
-
-        /*
-            carte.cartogroupe.attr("transform", "translate(" + d3.event.translate +
-                ")scale(" + (d3.event.scale) + ")");
-            carte.planigroupe.attr("transform", "translate(" + d3.event.translate +
-                ")scale(" + (d3.event.scale) + ")");
-            //Mettre a jour l'instance de zoom avant les cercles, sinon probleme de mise a l'echelle
-            carte.zoom.scale(d3.event.scale).translate(d3.event.translate);
-            zoomTranslateCircle(carte);
-            */
     }
 }
-
-/**
- * Permet d'effectuer un zoom semantic sur la carte placée en parametre.
- * Les cercles représentant les données sont espacé entre eux proportionnelement à la
- * taille du svg et à la valeur du zoom.
- *
- * @param carte
- *          carte sur laquelle s'applique les transformations
- */
-function zoomTranslateCircle(carte) {
-    //parcour tout les cercles du groupe.
-    carte.circlegroupe.selectAll("circle").each(function () {
-        var elt = d3.select(this);
-        /* Pour chaque cercle on ajoute un attribut transforme, avec pour valeur de translate
-         * la (position du cercle selectionné mis a l'échelle) - (la position du cercle selectionné).
-         * De cette maniere les cercles restent au milieu du pays auquel ils appartiennent.
-         */
-        elt.attr("transform", function () {
-            var cx = carte.scaleX(elt.attr("cx")) - elt.attr("cx");
-            var cy = carte.scaleY(elt.attr("cy")) - elt.attr("cy");
-
-            return "translate(" + cx + "," + cy + ")";
-        });
-    });
-}
-
 /**
  * Synchronise le zoom par défaut des cartes créées par l'utilisateur avec le
  * zoom de la premiere carte.
+ * Synchronise aussi la grosseur du trait du contour des pays.
  *
  * @param carte
  *              carte sur laquel synchroniser le zoom avec la premiere carte.
@@ -113,10 +68,8 @@ function synchroZoom(carte) {
         .style("stroke-width", function(){
             return tableauCarte[0].emprisesgroupe.style("stroke-width");
         });
-        //Mettre a jour l'instance de zoom avant les cercles, sinon probleme de mise a l'echelle
+        //Mettre a jour l'instance de zoom, sinon probleme d'affichage.
         carte.zoom.scale(tableauCarte[0].zoom.scale()).translate(tableauCarte[0].zoom.translate());
-        zoomTranslateCircle(carte);
-
     }
 }
 
@@ -125,6 +78,8 @@ function synchroZoom(carte) {
  * Permet de revenir a la position d'origine du zoom c'est à dire sans translation et un scale de 0
  * On vérifie si la case desynchro du zoom est coché, on vérifie aussi que l'attribut transform n'est pas nul
  * ou vide sinon cela cause des erreurs.
+ * Lors de l'appel de cette fonction, l'objet Carte n'est pas encore créé, on ne peut donc pas l'utiliser pour récuperer
+ * les parametres de la carte. On utilise donc l'id de la carte pour la retrouver dans le tableau des cartes.
  *
  * @param id
  *          Identifiant de la carte sur laquel on vient de double cliquer.
@@ -150,16 +105,12 @@ function resetZoom(id) {
             .style("stroke-width", stroke_width_pays);
         carte.emprisesgroupe.transition().duration(700).attr("transform", "translate(0,0)scale(1)")
             .style("stroke-width", stroke_width_empr);
-
-        carte.circlegroupe.selectAll("circle").each(function () {
-            d3.select(this).transition().duration(700).attr("transform", "translate(0,0)");
-        });
         carte.zoom.scale(1).translate([0, 0]);
     }
 }
 
 /**
- * Modifie la variable "synchro" de l'objet carte correspondant au paramettre id
+ * Modifie la variable "synchro" de l'objet carte correspondant au paramettre id.
  * Par défaut la variable est a true, on la passe donc a false lorsque l'on veut
  * désynchroniser une carte par rapport aux autres.
  *

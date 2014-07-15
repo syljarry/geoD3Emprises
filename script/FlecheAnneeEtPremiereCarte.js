@@ -1,13 +1,13 @@
 /**
  * Création des premiers éléments comme la fleche des années.
- * Ajout des listener sur les ronds des années et sur les boutons radio.
+ * Ajout des listener sur les ronds des années.
  * Creation de la premiere carte.
  *
  * @author Sylvain JARRY
  */
 
 /* affiche une ligne (rectangle) pour les années */
-var ligne = svg_y.append("rect")
+svg_y.append("rect")
     .attr("x", 10)
     .attr("y", 10)
     .attr("width", wy - 20)// -20 pour ne pas dépasser de la fleche.
@@ -28,7 +28,7 @@ svg_y.selectAll("text")
     .append("text")
     .text(function (d) {
         return (d);
-    })
+    });
 svg_y.selectAll("text")
     .data(annees)
     .attr("x", (function (d) {
@@ -54,7 +54,7 @@ svg_y.selectAll("circle")
         return xScale(d);
     })
     .attr("cy", 10)
-    .attr("r", 8)
+    .attr("r", 8);
 svg_y.selectAll("circle")
     .data(annees_labels)
     .text(function (d) {
@@ -82,22 +82,5 @@ svg_y.selectAll("circle")
 
 
     });
-
-/* quand on clique sur les boutons tous, sci, sve...
-d3.selectAll(".rd")
-    .on("click", function () {
-
-        // récupère les paramètres
-        tableauCarte[0].dispo = getDispo();
-        tableauCarte[0].Legend.description = getDescription();
-
-        //met à jour la légende uniquement pour la premiere carte.
-        maj_Legend(tableauCarte[0]);
-
-        //redessine la carte, on actualise que la premiere carte
-        maj_carte(tableauCarte[0]);
-
-    });
-*/
 /*Création de la premiere carte */
 creationNewCarte();

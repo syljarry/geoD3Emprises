@@ -8,7 +8,8 @@
 
 
 /**
- * Dessine la légende associé à la carte passé en paramètre
+ * Dessine la légende associé à la carte passé en paramètre.
+ * Si la disposition est dessous, on dessine directement la légende en dessous pour éviter des problemes d'affichage.
  *
  * @param carte
  *              Objet carte pour lequel on dessine la légende
@@ -305,7 +306,7 @@ var maj_emprise = function(carte) {
 /**
  * Dessine la carte passée en parametre en appelant les fonctions de dessin, et en
  * ce servant des fichiers de données.
- * Ne dessine les cartes que si elle ne sont pas déjà affichée.
+ * Ne dessine les cartes que si elle ne sont pas déjà affichée. Grace a la variable isShown
  *
  * @param carte
  *             Objet carte à dessiner

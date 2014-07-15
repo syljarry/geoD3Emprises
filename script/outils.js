@@ -81,7 +81,7 @@ var getYearFolder = function(year){
 };
 /**
  * Cherche la position dans le tableau de carte,
- * de l'objet carte qui correspond a l'id passer en parametre.
+ * de l'objet carte qui correspond a l'id passé en parametre.
  *
  * @param id
  *          identifiant de l'objet carte que l'on veut trouver
@@ -95,7 +95,7 @@ var indexTableau = function(id) {
 };
 
 /**
- * Supprime la carte correspondant à l'id passer en parametre.
+ * Supprime la carte correspondant à l'id passé en parametre.
  * Supprime l'objet du tableau, ainsi que la <div> correspondante.
  * Reposition également toute les autres cartes, en appellant designCarte().
  *

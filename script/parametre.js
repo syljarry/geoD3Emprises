@@ -10,17 +10,16 @@ var path_data = "data/";
 var colonne_code = "iso_a2"; // nom de la colonne contenant le code permettant de joindre le fond de carte JSON et les données CSV (ex. : "iso_a2" pour le code ISO 2)
 var acronymePays = "bo";
 var annees = [0, 1, 2, 3, 4];	// liste des années pour lesquelles il y a des données
-var annees_labels = ["avr 2013", "juil 2013", "oct 2013", "jan 2014", "avr 2014"];
-var anneeFolder = ["_2013_04", "_2013_07", "_2013_10", "_2014_01", "_2014_04"];
+var annees_labels = ["avr 2013", "juil 2013", "oct 2013", "jan 2014", "avr 2014"]; //texte des années affichées sur la fleche chronologique.
+var anneeFolder = ["_2013_04", "_2013_07", "_2013_10", "_2014_01", "_2014_04"]; //année dans le chemin d'accé aux fichiers
 var categories = ["_allcats", "_farming", "_biota", "_boundaries", "_climatologyMeteorologyAtmosphere", "_economy",
     "_elevation", "_environment", "_geoscientificInformation", "_health", "_imageryBaseMapsEarthCover",
     "_intelligenceMilitary", "_inlandsWaters", "_location", "_oceans", "_planningCadastre", "_society",
-    "_structure", "_transportation", "_utilitiesCommunication", "_null"];
+    "_structure", "_transportation", "_utilitiesCommunication", "_null"]; // nom des catégories dans le chemin d'accé aux fichiers.
 var nomCategories = ["Toute catégories", "Agriculture", "Biote", "Limites", "Climatologie/Météorologie/Atmosphère", "Economie",
     "Altitude", "Environnement", "Informations géoscientifiques", "Santé", "Imagerie/Cartes de base/Occupation des terres",
     "Renseignement/Secteur militaire", "Eaux intérieures", "Localisation", "Océans", "Planification/Cadastre",
-    "Société", "Structure", "Transport", "Services d'utilité publique/Communication", "Catégories sans nom"];
-// pour la discrétisation des emprises MD
+    "Société", "Structure", "Transport", "Services d'utilité publique/Communication", "Catégories sans nom"]; //nom des catégories affichés dans la liste de catégories, sous les cartes.
 var col_valeur = "nb"; // nom de la colonne des json avec la valeur à représenter
 var color_domain = [16, 30, 198, 224, 230, 250, 268, 296, 318]; // bornes pour la discrétisation
 var color_range = [ // jeu de couleurs pour la discrétisation
@@ -34,30 +33,24 @@ var color_range = [ // jeu de couleurs pour la discrétisation
     "rgb(13,87,161)",
     "rgb(8,48,107)"
 ];
-
 // pour les couleurs de la carte choroplèthe
 var color = d3.scale.threshold()
     .domain(color_domain)
     .range(color_range);
-
-// largeur des bordures de pays et des emprises
-var stroke_width_pays = 1;
-var stroke_width_empr = 0;
-var duree_transition = 1000;	// durée de la transition en millisecondes quand on change de données à afficher
-var duree_transition2 = 500;    //durée de la transition lors du repositionnement des cartes.
-var legend_labels = ["1 - 16", "16 - 30", "30 - 198", "198 - 224", "224 - 230", "230 - 250", "250 - 268", "268 - 296", "296 - 318"] // étiquettes de la légende
+var stroke_width_pays = 1;// largeur des bordures de pays
+var stroke_width_empr = 0; //largeur des bordures des emprises
+var duree_transition = 1000;// durée de la transition en millisecondes quand on change de données à afficher
+var duree_transition2 = 500;//durée de la transition lors du repositionnement des cartes.
+var legend_labels = ["1 - 16", "16 - 30", "30 - 198", "198 - 224", "224 - 230", "230 - 250", "250 - 268", "268 - 296", "296 - 318"]; // étiquettes de la légende
 var titre_leg = "Nombre emprises :"; // titre de la légende
-var sous_titre_leg = "Description :";
-var type_leg = "Carte représantant des emprises";
+var sous_titre_leg = "Description :"; //sous titre de la légende
+var type_leg = "Carte représantant des emprises"; //type de légende (laisser vide pour supprimer).
 // largeur et hauteur des carrés de la légende
 var ls_w = 20;
 var ls_h = 20;
 
-var tableauCarte = [];	//tableau contenant chaque carte affichée.
-var compteur = 0; // utilisé pour la mise en page des cartes, sert a compte les doublet et triplet de carte
-var etage = 1; //utilisé pour la mise en page des cartes, sert a descendre d'un étage (d'une ligne) selon la disposition des cartes.
-/*Compteur du nombre de carte créé*/
-var compteurCarte = 0;
+var tableauCarte = []; //tableau contenant tout les objets Cartes.
+var compteurCarte = 0; //Compteur du nombre de carte créé
 
 /* Width and height for the years */
 var wy = 960;
@@ -86,8 +79,8 @@ var projection = d3.geo.robinson()
 var path = d3.geo.path()
     .projection(projection);
 // min et max possible en zoomant (plus maxzoom est élevé, plus on peut zoomer)
-var minzoom = 0.7;
-var maxzoom = 200;
+var minzoom = 0.7;//niveau de zoom minimum
+var maxzoom = 200;//niveau de zoom maximun
 
 // centre de la carte et échelle pour la vue initiale (ici, Bolivie)
 var centre = [-65, -18];
@@ -96,16 +89,15 @@ var echelle = 1300;
 projection
     .scale(echelle)
     .center(centre);
-/* var graticule = d3.geo.graticule(); */
 
 /**
  * Objet carte. Cet objet comprend tout les parametres associé a une carte.
- * Il est utilisé pour manipuler facilement  les cartes dans un tableau de carte.
+ * Il est utilisé pour manipuler facilement les cartes dans un tableau de carte.
  *
  * @param id
  *          Identifiant unique de chaque carte.
  * @param Legend
- *          Objet Legende qui comprend les parametre de la légende associé à la carte.
+ *          Objet Legende qui comprend les parametres de la légende associés à la carte.
  * @param annee
  *          Année des données de la carte.
  * @param dispo
@@ -119,7 +111,7 @@ projection
  * @param emprisesgroupe
  *          Groupe pour dessiner les emprises sur un pays.
  * @param isShown
- *          Indique si la carte est déja dessiné ou non
+ *          Indique si la carte est déja dessinée ou non
  * @param div_map
  *          balise div dans le html comprenant l'ensemble de la carte(légende+carte)
  * @param div_legend
@@ -139,7 +131,7 @@ projection
  * @param scaleY
  *          Echelle linéaire d3 sur l'axe Y permettant le zoom semantic sur les cercles
  * @param toolTip
- *          Permet l'affichage d'une tooltip lors du click sur un pays. Comprend nom + valeur de donnée.
+ *          Permet l'affichage d'une tooltip lors du click sur un pays.
  * @constructor
  */
 function Carte(id, Legend, annee, dispo, svg_map,

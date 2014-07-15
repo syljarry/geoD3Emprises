@@ -378,7 +378,8 @@ function miseEnPageLegende(carte, h, w, position) {
         carte.div_type.select("svg").attr("height", 80);
         carte.div_dispo.select("h2").text(null);
         carte.div_dispo.style("margin-top", 0 + "px")
-            .style("margin-left", 280 + "px");
+            .style("margin-left", 280 + "px")
+            .style("height", 90 + "px");
         //On est obligé de redessinner la légende.
         interConfigLegendDessous();
     }
