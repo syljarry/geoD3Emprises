@@ -101,7 +101,8 @@ function creationNewCarte() {
     g_node.append("rect")
         .attr("class", "overlay")
         .attr("width", screen.width)
-        .attr("height", screen.height);
+        .attr("height", screen.height)
+        .attr("transform", "translate(-300,-100)");
 
     //création des groupes
     var emprisesgroupe = g_node.append("g").attr("id", "g_emprises");
